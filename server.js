@@ -4,11 +4,15 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var ejs = require('ejs');
 var ejsMate = require('ejs-mate');
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
+var flash = require('express-flash');
+var secret = require('./config/secret');
 
 
 var app = express();
 
-mongoose.connect('mongodb://root:abc123@ds111963.mlab.com:11963/amazonclone', function (err) {
+mongoose.connect(secret.database, function (err) {
     if (err) {
         console.log(err);
     } else {
@@ -23,6 +27,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(cookieParser());
+app.use(session({
+    resave: true,
+    saveUninitialized: true,
+    secret: secret.secretKey
+}));
+app.use(flash());
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 
@@ -32,7 +43,10 @@ app.use(mainRoutes); //app.use('/',mainRoutes);
 app.use(userRoutes);
 
 
-app.listen(3000, function (err) {
+app.listen(secret.port, function (err) {
     if (err) throw err;
-    console.log('Server is Running non port 3000');
+    console.log('Server is Running non port' + secret.port);
 });
+
+
+//express-session, express-flash, cookie-parser

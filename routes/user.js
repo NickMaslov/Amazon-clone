@@ -2,7 +2,9 @@ var router = require('express').Router();
 var User = require('../models/user');
 
 router.get('/signup', function (req, res, next) {
-    res.render('accounts/signup');
+    res.render('accounts/signup', {
+        errors: req.flash('errors')
+    });
 });
 
 
@@ -16,19 +18,17 @@ router.post('/signup', function (req, res, next) {
     User.findOne({
         email: req.body.email
     }, function (err, existingUser) {
+        if (err) return next(err); //? eslint probl
         if (existingUser) {
-            if (err) next(err); //? eslint probl
-            console.log(req.body.email + ' is already exist');
+            req.flash('errors', 'Account with that email address already exists');
             return res.redirect('/signup');
         } else {
             user.save(function (err, user) {
-                if (err) next(err);
-
-                res.json('New user has been created');
+                if (err) return next(err);
+                return res.redirect('/');
             });
         }
     });
-Í
 });
 
 module.exports = router;
