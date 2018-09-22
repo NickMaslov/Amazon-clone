@@ -6,8 +6,6 @@ var ejs = require('ejs');
 var ejsMate = require('ejs-mate');
 
 
-var User = require('./models/user');
-
 var app = express();
 
 mongoose.connect('mongodb://root:abc123@ds111963.mlab.com:11963/amazonclone', function (err) {
@@ -19,6 +17,7 @@ mongoose.connect('mongodb://root:abc123@ds111963.mlab.com:11963/amazonclone', fu
 });
 
 //Middleware
+app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -27,28 +26,10 @@ app.use(bodyParser.urlencoded({
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 
-app.post('/create-user', function (req, res, next) {
-    var user = new User();
+var mainRoutes = require('./routes/main');
 
-    user.profile.name = req.body.name;
-    user.password = req.body.password;
-    user.email = req.body.email;
+app.use(mainRoutes); //app.use('/',mainRoutes);
 
-    user.save(function (err) {
-        if (err) return next(err);
-
-        res.json('Successfully created a new user');
-
-    });
-});
-
-app.get('/', function(req, res){
-    res.render('home');
-});
-
-app.get('/about', function(req,res){
-    res.render('about');
-});
 
 app.listen(3000, function (err) {
     if (err) throw err;
