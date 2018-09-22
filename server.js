@@ -7,6 +7,9 @@ var ejsMate = require('ejs-mate');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var flash = require('express-flash');
+var MongoStore = require('connect-mongo')(session);
+var passport = require('passport');
+
 var secret = require('./config/secret');
 
 
@@ -31,7 +34,8 @@ app.use(cookieParser());
 app.use(session({
     resave: true,
     saveUninitialized: true,
-    secret: secret.secretKey
+    secret: secret.secretKey,
+    store: new MongoStore({ url: secret.database, autoReconnect: true })
 }));
 app.use(flash());
 app.engine('ejs', ejsMate);
@@ -47,6 +51,3 @@ app.listen(secret.port, function (err) {
     if (err) throw err;
     console.log('Server is Running non port' + secret.port);
 });
-
-
-//express-session, express-flash, cookie-parser
