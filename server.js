@@ -27,8 +27,9 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 
 var mainRoutes = require('./routes/main');
-
+var userRoutes = require('./routes/user');
 app.use(mainRoutes); //app.use('/',mainRoutes);
+app.use(userRoutes);
 
 
 app.listen(3000, function (err) {
